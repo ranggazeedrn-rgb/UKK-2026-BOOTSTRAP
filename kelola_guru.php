@@ -1,3 +1,6 @@
+<?php
+// kelola_guru.php
+session_start();
 include 'config/koneksi.php'; // Pastikan path ini benar sesuai foldermu
 include 'cek_akses.php';
 
@@ -76,7 +79,6 @@ if (!empty($search)) {
 $query_data = "SELECT * FROM t_guru $where ORDER BY id DESC";
 $result = mysqli_query($koneksi, $query_data);
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>

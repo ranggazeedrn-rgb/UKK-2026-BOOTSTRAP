@@ -1,56 +1,58 @@
 <?php
 session_start();
-require_once 'config/koneksi.php';
+include 'config/koneksi.php';
 
-if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Wali Kelas') {
+// Proteksi Admin
+if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Admin') {
     header("Location: login.php");
     exit;
 }
-
-$total_pelanggaran = @$pdo->query("SELECT COUNT(*) FROM t_pelanggaran_siswa")->fetchColumn() ?: 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard Wali Kelas - Sistem Pelanggaran</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; margin: 0; padding: 30px; }
-        .container { background: rgba(30, 30, 30, 0.8); padding: 25px 35px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); max-width: 1000px; margin: auto; }
-        h1, h2, h3 { color: #ffffff; font-weight: 600; margin-top: 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; text-align: center; }
-        .stat-card h3 { margin: 0; font-size: 2em; color: #ff4d4d; }
-        .stat-card p { margin: 5px 0 0 0; color: #aaa; }
-        .btn-danger { display: inline-block; padding: 10px 18px; background: #dc3545; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-bottom: 20px; transition: background 0.3s;}
-        .btn-danger:hover { background: #c82333; }
-        .nav-links { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; flex-wrap: wrap; }
-        .nav-links a { color: #aaa; text-decoration: none; padding: 8px 12px; border-radius: 4px; background: rgba(255,255,255,0.05); }
-        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.1); }
-    </style>
+    <title>Kelola Wali Kelas - Sistem Kedisiplinan</title>
+    <?php include 'layouts/head.php'; ?>
 </head>
-<body>
-    <div class="container">
-        <h1>Dashboard Wali Kelas</h1>
-        <p>Selamat datang, <strong><?php echo htmlspecialchars($_SESSION['name']); ?></strong> (Wali Kelas).</p>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3><?php echo $total_pelanggaran; ?></h3>
-                <p>Total Kasus Pelanggaran Siswa Binaan</p>
-            </div>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex">
+    
+    <?php include 'layouts/sidebar.php'; ?>
+
+    <main class="flex-1 p-8 bg-slate-50 overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-black">Kelola Wali Kelas</h1>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm">Tetapkan Wali Kelas</button>
         </div>
 
-        <h3>Menu Utama Wali Kelas</h3>
-        <div class="nav-links">
-            <a href="app_catat_pelanggaran.php">Catat Pelanggaran</a>
-            <a href="app_tindakan.php">Tindakan</a>
-            <a href="app_laporan.php">Laporan</a>
-            <a href="app_riwayat.php">Riwayat</a>
-            <a href="app_rekap_poin.php">Rekap Poin Siswa</a>
+        <div class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-200">
+            <h3 class="text-sm font-bold text-black mb-4">Daftar Wali Kelas Aktif</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-slate-200">
+                    <thead class="bg-slate-100">
+                        <tr>
+                            <th class="border-b border-slate-200 px-4 py-3 text-xs font-bold text-slate-600 uppercase text-left">TAHUN AJARAN</th>
+                            <th class="border-b border-slate-200 px-4 py-3 text-xs font-bold text-slate-600 uppercase text-center">KELAS</th>
+                            <th class="border-b border-slate-200 px-4 py-3 text-xs font-bold text-slate-600 uppercase text-left">NAMA GURU (WALI KELAS)</th>
+                            <th class="border-b border-slate-200 px-4 py-3 text-xs font-bold text-slate-600 uppercase text-center">STATUS</th>
+                            <th class="border-b border-slate-200 px-4 py-3 text-xs font-bold text-slate-600 uppercase text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data Statis Placeholder untuk Desain -->
+                        <tr class="hover:bg-slate-50 border-b border-slate-100">
+                            <td class="px-4 py-3 text-sm">2026/2027</td>
+                            <td class="px-4 py-3 text-sm font-bold text-black text-center">X RPL 1</td>
+                            <td class="px-4 py-3 text-sm">Budi Santoso, S.Kom</td>
+                            <td class="px-4 py-3 text-sm text-center"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Aktif</span></td>
+                            <td class="px-4 py-3 text-sm text-center">
+                                <button class="text-blue-600 font-bold mr-2">Edit</button>
+                                <button class="text-red-600 font-bold">Hapus</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        
-        <a href="logout.php" class="btn-danger" style="margin-top: 20px;">Logout</a>
-    </div>
+    </main>
 </body>
 </html>
