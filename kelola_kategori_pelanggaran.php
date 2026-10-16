@@ -1,5 +1,4 @@
 <?php
-// kelola_kategori_pelanggaran.php
 session_start();
 include 'config/koneksi.php';
 include 'cek_akses.php';
@@ -40,76 +39,87 @@ $result = mysqli_query($koneksi, $query_data);
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Kelola Kategori Pelanggaran</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .bg-radial-dots { background-color: #0f172a; background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 24px 24px; }
-        .glass-card { background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-    </style>
+    <title>Kelola Kategori Pelanggaran - Sistem Kedisiplinan</title>
+    <?php include 'layouts/head.php'; ?>
 </head>
-<body class="bg-radial-dots text-slate-200 min-h-screen p-6 md:p-10">
-    <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex">
+
+    <?php include 'layouts/sidebar.php'; ?>
+
+    <main class="flex-1 p-8 bg-slate-50 overflow-y-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                <a href="dashboard_admin.php" class="text-amber-400 hover:text-amber-300 text-sm mb-2 inline-block"><i class="fa-solid fa-arrow-left mr-1"></i> Kembali</a>
-                <h1 class="text-3xl font-bold text-white"><i class="fa-solid fa-tags text-amber-400 mr-2"></i> Kategori Pelanggaran</h1>
+                <h1 class="text-2xl font-bold text-black">Kelola Kategori Pelanggaran</h1>
+                <p class="text-sm font-bold text-slate-500 mt-1">Atur pengelompokan jenis pelanggaran siswa.</p>
             </div>
-            <button onclick="openModal('create')" class="bg-amber-600 hover:bg-amber-500 text-white px-5 py-2.5 rounded-lg font-medium"><i class="fa-solid fa-plus"></i> Tambah Kategori</button>
+            <button onclick="openModal('create')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Tambah Kategori
+            </button>
         </div>
 
         <?php if (isset($_SESSION['flash'])): ?>
-            <div class="p-4 mb-6 rounded-lg text-sm border bg-emerald-900/50 text-emerald-300 border-emerald-800">
+            <div class="p-4 mb-6 rounded-lg text-sm font-bold <?php echo $_SESSION['flash']['type'] === 'success' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'; ?>">
                 <?php echo $_SESSION['flash']['message']; unset($_SESSION['flash']); ?>
             </div>
         <?php endif; ?>
 
-        <div class="glass-card rounded-xl overflow-hidden shadow-xl border border-slate-700/50">
-            <table class="w-full text-left text-sm text-slate-300">
-                <thead class="bg-slate-900/90 text-slate-400 uppercase text-xs">
-                    <tr>
-                        <th class="px-6 py-4">Nama Kategori</th>
-                        <th class="px-6 py-4 text-center">Status</th>
-                        <th class="px-6 py-4 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700/50">
-                    <?php while ($data = mysqli_fetch_assoc($result)): ?>
-                        <tr class="hover:bg-slate-800/60">
-                            <td class="px-6 py-4 font-bold text-white"><?php echo htmlspecialchars($data['nama']); ?></td>
-                            <td class="px-6 py-4 text-center">
-                                <?php echo $data['status_aktif'] == 1 ? '<span class="text-emerald-400">Aktif</span>' : '<span class="text-slate-500">Non-Aktif</span>'; ?>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <button onclick='openEditModal(<?php echo json_encode($data); ?>)' class="px-3 py-1.5 bg-indigo-900/40 text-indigo-400 rounded hover:bg-indigo-600 hover:text-white"><i class="fa-solid fa-pen"></i></button>
-                                <a href="kelola_kategori_pelanggaran.php?delete_id=<?php echo $data['id']; ?>" onclick="return confirm('Hapus kategori?')" class="px-3 py-1.5 bg-rose-900/40 text-rose-400 rounded hover:bg-rose-600 hover:text-white"><i class="fa-solid fa-trash"></i></a>
-                            </td>
+        <div class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-200">
+            <h3 class="text-sm font-bold text-black mb-4">Daftar Kategori Pelanggaran</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-slate-300">
+                    <thead class="bg-slate-100">
+                        <tr>
+                            <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-left">NAMA KATEGORI</th>
+                            <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-center w-32">STATUS</th>
+                            <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-center w-32">AKSI</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+                            <?php while ($data = mysqli_fetch_assoc($result)): ?>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="border border-slate-300 px-4 py-3 text-sm font-bold text-black"><?php echo htmlspecialchars($data['nama']); ?></td>
+                                    <td class="border border-slate-300 px-4 py-3 text-sm text-center">
+                                        <?php echo $data['status_aktif'] == 1 ? '<span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded text-xs">Aktif</span>' : '<span class="text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded text-xs">Non-Aktif</span>'; ?>
+                                    </td>
+                                    <td class="border border-slate-300 px-4 py-3 text-sm text-center">
+                                        <button onclick='openEditModal(<?php echo json_encode($data); ?>)' class="text-blue-600 font-bold mr-2 hover:underline">Edit</button>
+                                        <a href="kelola_kategori_pelanggaran.php?delete_id=<?php echo $data['id']; ?>" onclick="return confirm('Hapus kategori ini?')" class="text-red-600 font-bold hover:underline">Hapus</a>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="3" class="border border-slate-300 px-4 py-8 text-center text-slate-500 font-bold">Belum ada kategori pelanggaran.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </main>
 
     <!-- Modal Form -->
-    <div id="modalForm" class="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center hidden p-4">
-        <div class="glass-card max-w-md w-full p-6 rounded-2xl">
-            <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-tag text-amber-400"></i> Form Kategori</h3>
+    <div id="modalForm" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white max-w-md w-full p-8 rounded-2xl shadow-xl">
+            <h3 id="modalTitle" class="text-xl font-bold text-black mb-6">Form Kategori</h3>
             <form method="POST" action="kelola_kategori_pelanggaran.php">
                 <input type="hidden" name="action" id="formAction" value="create">
                 <input type="hidden" name="id" id="dataId">
+
                 <div class="mb-4">
-                    <label class="block text-xs text-slate-400 mb-1">Nama Kategori (Misal: Kerajinan, Sikap)</label>
-                    <input type="text" name="nama" id="inputNama" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">NAMA KATEGORI *</label>
+                    <input type="text" name="nama" id="inputNama" required placeholder="Contoh: Kerajinan, Sikap" class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
                 </div>
+
                 <div class="flex items-center gap-2 mb-6">
-                    <input type="checkbox" name="status_aktif" id="inputStatus" value="1" checked>
-                    <label class="text-sm text-slate-300">Status Aktif</label>
+                    <input type="checkbox" name="status_aktif" id="inputStatus" value="1" checked class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500">
+                    <label class="text-sm font-bold text-slate-700">Set Kategori Aktif</label>
                 </div>
-                <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg">Simpan</button>
+
+                <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg text-sm hover:bg-slate-300">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700">Simpan</button>
                 </div>
             </form>
         </div>
@@ -118,20 +128,22 @@ $result = mysqli_query($koneksi, $query_data);
     <script>
         function openModal(mode) {
             document.getElementById('modalForm').classList.remove('hidden');
-            if(mode === 'create') {
-                document.getElementById('formAction').value = 'create';
-                document.getElementById('dataId').value = '';
-                document.getElementById('inputNama').value = '';
-                document.getElementById('inputStatus').checked = true;
-            }
+            document.getElementById('modalTitle').innerText = 'Tambah Kategori Pelanggaran';
+            document.getElementById('formAction').value = 'create';
+            document.getElementById('dataId').value = '';
+            document.getElementById('inputNama').value = '';
+            document.getElementById('inputStatus').checked = true;
         }
+
         function openEditModal(data) {
             document.getElementById('modalForm').classList.remove('hidden');
+            document.getElementById('modalTitle').innerText = 'Edit Kategori Pelanggaran';
             document.getElementById('formAction').value = 'update';
             document.getElementById('dataId').value = data.id;
             document.getElementById('inputNama').value = data.nama;
             document.getElementById('inputStatus').checked = data.status_aktif == 1;
         }
+
         function closeModal() { document.getElementById('modalForm').classList.add('hidden'); }
     </script>
 </body>
