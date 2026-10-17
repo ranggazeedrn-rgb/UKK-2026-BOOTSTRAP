@@ -14,7 +14,7 @@ $role = $_SESSION['role'] ?? '';
 ?>
 <aside class="w-64 bg-slate-100 flex flex-col hidden md:flex shrink-0 border-r border-slate-200">
     <div class="flex items-center justify-center h-32 mt-4">
-        <i class="fa-brands fa-ethereum text-6xl text-blue-600"></i>
+        <i class="fa-solid fa-school text-6xl text-blue-600"></i>
     </div>
     <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
         <!-- Menu Umum untuk semua role -->

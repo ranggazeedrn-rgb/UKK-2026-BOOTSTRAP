@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="w-full max-w-sm border-[3px] rounded-[2.5rem] p-10 bg-white">
         <div class="text-center mb-8">
-            <i class="fa-brands fa-ethereum text-6xl text-blue-600"></i>
+        <i class="fa-solid fa-school text-6xl text-blue-600"></i>
         </div>
 
         <?php if (!empty($error)): ?>
