@@ -13,7 +13,18 @@ $total_guru = mysqli_fetch_assoc($query_guru)['total'] ?? 0;
 $query_pelanggaran = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM t_pelanggaran_siswa");
 $total_pelanggaran = mysqli_fetch_assoc($query_pelanggaran)['total'] ?? 0;
 
-$query_recent = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran_siswa ORDER BY tanggal DESC LIMIT 5");
+$query_recent = mysqli_query($koneksi, "
+    SELECT 
+        ps.tanggal,
+        ps.poin,
+        s.nama AS nama_siswa,
+        k.nama AS nama_kelas
+    FROM t_pelanggaran_siswa ps
+    LEFT JOIN t_siswa s ON ps.siswa_id = s.id
+    LEFT JOIN t_kelas k ON ps.kelas_id = k.id
+    ORDER BY ps.tanggal DESC 
+    LIMIT 5
+");
 ?>
 <!DOCTYPE html>
 <html lang="id">

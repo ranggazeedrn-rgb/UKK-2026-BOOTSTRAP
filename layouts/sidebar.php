@@ -71,11 +71,24 @@ $role = $_SESSION['role'] ?? '';
         <a href="catatan_pelanggaran.php" class="flex items-center gap-4 px-4 py-3 text-sm font-bold text-slate-700 hover:text-blue-600 transition <?php echo $current_page == 'catatan_pelanggaran.php' ? 'text-blue-600 bg-blue-50 rounded-lg' : ''; ?>">
             <i class="fa-solid fa-clipboard-user text-lg w-5 text-center"></i> Catat Pelanggaran
         </a>
+        <a href="rekap_point.php" class="flex items-center gap-4 px-4 py-3 text-sm font-bold text-slate-700 hover:text-blue-600 transition <?php echo $current_page == 'rekap_point.php' ? 'text-blue-600 bg-blue-50 rounded-lg' : ''; ?>">
+            <i class="fa-solid fa-calculator text-lg w-5 text-center"></i> Rekap Poin
+
+
+        </a>
         <a href="laporan.php" class="flex items-center gap-4 px-4 py-3 text-sm font-bold text-slate-700 hover:text-blue-600 transition <?php echo $current_page == 'laporan.php' ? 'text-blue-600 bg-blue-50 rounded-lg' : ''; ?>">
             <i class="fa-solid fa-file-contract text-lg w-5 text-center"></i> Laporan
         </a>
         <a href="riwayat.php" class="flex items-center gap-4 px-4 py-3 text-sm font-bold text-slate-700 hover:text-blue-600 transition <?php echo $current_page == 'riwayat.php' ? 'text-blue-600 bg-blue-50 rounded-lg' : ''; ?>">
             <i class="fa-solid fa-clock-rotate-left text-lg w-5 text-center"></i> Riwayat
+        </a>
+
+        <!-- Menu About Me -->
+        <div class="pt-4 pb-1">
+            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">About Me</p>
+        </div>
+        <a href="aboutme.php" class="flex items-center gap-4 px-4 py-3 text-sm font-bold text-slate-700 hover:text-blue-600 transition <?php echo $current_page == 'aboutme.php' ? 'text-blue-600 bg-blue-50 rounded-lg' : ''; ?>">
+            <i class="fa-solid fa-user text-lg w-5 text-center"></i> About Me
         </a>
 
         <!-- Menu Khusus WALI KELAS -->

@@ -37,7 +37,7 @@ $latest_list = @mysqli_query($koneksi, $query_latest);
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-black">Dashboard Guru</h1>
-            <p class="text-sm font-bold text-slate-500 mt-1">Selamat datang kembali, <?php echo htmlspecialchars($_SESSION['nama'] ?? $_SESSION['username'] ?? 'Guru'); ?>!</p>
+            <p class="text-sm font-bold text-slate-500 mt-1">Selamat datang kembali, <?php echo htmlspecialchars($_SESSION['name'] ?? $_SESSION['username'] ?? 'Guru'); ?>!</p>
         </div>
 
         <!-- Metric Cards -->

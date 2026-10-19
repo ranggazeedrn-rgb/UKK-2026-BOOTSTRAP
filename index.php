@@ -23,7 +23,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     <!-- Navbar -->
     <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-2">
-            <i class="fa-brands fa-ethereum text-2xl text-blue-600"></i>
+            <i class=" fa-solid fa-school text-3xl text-blue-600"></i>
             <span class="font-bold text-black text-lg tracking-wide">SISTEM KEDISIPLINAN</span>
         </div>
         <a href="login.php" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm transition">
@@ -35,7 +35,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     <section class="flex-1 flex items-center justify-center p-6">
         <div class="bg-white border-[3px] border-blue-500 rounded-[2.5rem] p-10 max-w-2xl w-full text-center shadow-lg">
             <div class="mb-6 flex justify-center">
-                <i class="fa-brands fa-ethereum text-6xl text-blue-600"></i>
+                 <i class=" fa-solid fa-school text-6xl text-blue-600"></i>
             </div>
             <h1 class="text-3xl font-bold text-black mb-4">Sistem Informasi Kedisiplinan Siswa</h1>
             <p class="text-slate-500 text-sm mb-8 leading-relaxed">

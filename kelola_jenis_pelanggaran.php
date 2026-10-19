@@ -77,6 +77,17 @@ $kategori_res = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran_kategori WHE
 <head>
     <title>Kelola Jenis Pelanggaran - Sistem Kedisiplinan</title>
     <?php include 'layouts/head.php'; ?>
+    
+    <!-- CSS DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            outline: none;
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex">
 
@@ -125,7 +136,8 @@ $kategori_res = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran_kategori WHE
         <div class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-200">
             <h3 class="text-sm font-bold text-black mb-4">Daftar Jenis Pelanggaran</h3>
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse border border-slate-300">
+                <!-- Tambahkan id="tabelData" di sini -->
+                <table id="tabelData" class="w-full border-collapse border border-slate-300">
                     <thead class="bg-slate-100">
                         <tr>
                             <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-center w-24">KODE</th>
@@ -218,6 +230,30 @@ $kategori_res = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran_kategori WHE
             </form>
         </div>
     </div>
+
+    <!-- JS jQuery dan DataTables -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#tabelData').DataTable({
+                "searching": false, // Menyembunyikan form pencarian bawaan DataTables
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ data",
+                    "zeroRecords": "Tidak ada data yang ditemukan",
+                    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "infoEmpty": "Tidak ada data tersedia",
+                    "infoFiltered": "(disaring dari _MAX_ total data)",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Selanjutnya",
+                        "previous": "Sebelumnya"
+                    }
+                }
+            });
+        });
+    </script>
 
     <script>
         function openModal(mode) {

@@ -1,7 +1,7 @@
 <?php
 // kelola_guru.php
 session_start();
-include 'config/koneksi.php'; // Pastikan path ini benar sesuai foldermu
+include 'config/koneksi.php'; 
 include 'cek_akses.php';
 
 // Proses Simpan / Edit Data
@@ -15,17 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $status_aktif = isset($_POST['status_aktif']) ? 1 : 0;
 
     if ($action === 'create') {
-        // 1. Buat akun login untuk Guru (t_users)
-        $password = 'guru123'; // Password default
+        $password = 'guru123'; 
         
-        // FIX: Tambahkan remember_token dan email_verified_at agar tidak error NOT NULL di MySQL
         $query_user = "INSERT INTO t_users (name, email, password, email_verified_at, remember_token, role, created_at, updated_at) 
                        VALUES ('$nama', '$email', '$password', NOW(), '', 'guru', NOW(), NOW())";
         
         if (mysqli_query($koneksi, $query_user)) {
-            $new_user_id = mysqli_insert_id($koneksi); // Ambil ID user yang baru dibuat
+            $new_user_id = mysqli_insert_id($koneksi); 
             
-            // 2. Simpan biodata ke t_guru
             $query_guru = "INSERT INTO t_guru (nip, nama, email, status_aktif, user_id, created_at, updated_at) 
                            VALUES ('$nip', '$nama', '$email', '$status_aktif', '$new_user_id', NOW(), NOW())";
             
@@ -38,9 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal membuat akun user: ' . mysqli_error($koneksi)];
         }
     } elseif ($action === 'update' && $id && $user_id) {
-        // Update biodata guru
         $query_guru = "UPDATE t_guru SET nip = '$nip', nama = '$nama', email = '$email', status_aktif = '$status_aktif', updated_at = NOW() WHERE id = '$id'";
-        // Update nama/email di akun login
         $query_user = "UPDATE t_users SET name = '$nama', email = '$email', updated_at = NOW() WHERE id = '$user_id'";
         
         if (mysqli_query($koneksi, $query_guru) && mysqli_query($koneksi, $query_user)) {
@@ -56,7 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // Proses Hapus Data
 if (isset($_GET['delete_user_id'])) {
     $del_user_id = (int)$_GET['delete_user_id'];
-    // Hapus dari t_users otomatis akan menghapus t_guru karena Constraint ON DELETE CASCADE di database
     $query = "DELETE FROM t_users WHERE id = '$del_user_id' AND role = 'guru'";
     if (mysqli_query($koneksi, $query)) {
         $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Guru beserta akun login berhasil dihapus!'];
@@ -84,6 +78,16 @@ $result = mysqli_query($koneksi, $query_data);
 <head>
     <title>Kelola Data Guru</title>
     <?php include 'layouts/head.php'; ?>
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            outline: none;
+        }
+    </style>
 </head>
 <body class="bg-white text-slate-800 font-sans">
     <div class="flex min-h-screen">
@@ -111,7 +115,7 @@ $result = mysqli_query($koneksi, $query_data);
             <div class="bg-slate-100 p-6 rounded-[1.5rem]">
                 <h3 class="text-sm font-bold text-black mb-4">Daftar Guru</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full border-collapse border border-slate-300 bg-slate-100">
+                    <table id="tabelData" class="w-full border-collapse border border-slate-300 bg-slate-100">
                         <thead>
                             <tr>
                                 <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-center">NIP</th>
@@ -180,6 +184,30 @@ $result = mysqli_query($koneksi, $query_data);
             </form>
         </div>
     </div>
+
+    <!-- JS jQuery dan DataTables -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#tabelData').DataTable({
+                "searching": false, // Menyembunyikan form pencarian bawaan DataTables
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ data",
+                    "zeroRecords": "Tidak ada data yang ditemukan",
+                    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "infoEmpty": "Tidak ada data tersedia",
+                    "infoFiltered": "(disaring dari _MAX_ total data)",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Selanjutnya",
+                        "previous": "Sebelumnya"
+                    }
+                }
+            });
+        });
+    </script>
 
     <script>
         function openModal(mode) {
