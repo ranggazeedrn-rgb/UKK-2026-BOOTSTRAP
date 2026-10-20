@@ -185,13 +185,13 @@ session_start();
                         <p class="text-sm font-medium text-blue-100">Punya ide proyek, tugas, atau ingin diskusi seputar teknologi?</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <a href="#" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
+                        <a href="https://github.com/ranggazeedrn-rgb" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
                             <i class="fa-brands fa-github text-xl"></i>
                         </a>
                         <a href="#" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
                             <i class="fa-brands fa-instagram text-xl"></i>
                         </a>
-                        <a href="#" class="w-12 h-12 rounded-full bg-white/10 bder border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
+                        <a href="gmailto:ranggazeedrn@gmail.com" class="w-12 h-12 rounded-full bg-white/10 bder border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
                             <i class="fa-regular fa-envelope text-xl"></i>
                         </a>
                     </div>
