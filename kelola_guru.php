@@ -97,7 +97,7 @@ $result = mysqli_query($koneksi, $query_data);
         <main class="flex-1 p-8 bg-white overflow-y-auto">
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-2xl font-bold text-black">Kelola Data Guru</h1>
-                <button onclick="openModal('create')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm">Tambah Guru</button>
+                <button onclick="openModal('create')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm "> <i class="fa-solid fa-plus"></i> Tambah Guru</button>
             </div>
 
             <?php if (isset($_SESSION['flash'])): ?>
@@ -112,11 +112,12 @@ $result = mysqli_query($koneksi, $query_data);
                 <button type="submit" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg text-sm font-bold">Cari</button>
             </form>
 
-            <div class="bg-slate-100 p-6 rounded-[1.5rem]">
+            <div class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-200">
                 <h3 class="text-sm font-bold text-black mb-4">Daftar Guru</h3>
                 <div class="overflow-x-auto">
-                    <table id="tabelData" class="w-full border-collapse border border-slate-300 bg-slate-100">
-                        <thead>
+                    <!-- Class bg-slate-100 dihapus pada table agar menyerupai kelola_kelas -->
+                    <table id="tabelData" class="w-full border-collapse border border-slate-300">
+                        <thead class="bg-slate-100">
                             <tr>
                                 <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-center">NIP</th>
                                 <th class="border border-slate-300 px-4 py-3 text-xs font-bold text-black uppercase text-left">NAMA LENGKAP</th>
@@ -128,16 +129,16 @@ $result = mysqli_query($koneksi, $query_data);
                         <tbody>
                             <?php if (mysqli_num_rows($result) > 0): ?>
                                 <?php while ($data = mysqli_fetch_assoc($result)): ?>
-                                    <tr>
+                                    <tr class="hover:bg-slate-50">
                                         <td class="border border-slate-300 px-4 py-3 text-sm text-center"><?php echo htmlspecialchars($data['nip']); ?></td>
                                         <td class="border border-slate-300 px-4 py-3 text-sm font-bold text-black"><?php echo htmlspecialchars($data['nama']); ?></td>
                                         <td class="border border-slate-300 px-4 py-3 text-sm"><?php echo htmlspecialchars($data['email']); ?></td>
                                         <td class="border border-slate-300 px-4 py-3 text-sm text-center">
-                                            <?php echo $data['status_aktif'] == 1 ? '<span class="text-green-600 font-bold">Aktif</span>' : '<span class="text-slate-500 font-bold">Non-Aktif</span>'; ?>
+                                            <?php echo $data['status_aktif'] == 1 ? '<span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded text-xs">Aktif</span>' : '<span class="text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded text-xs">Non-Aktif</span>'; ?>
                                         </td>
                                         <td class="border border-slate-300 px-4 py-3 text-sm text-center">
-                                            <button onclick='openEditModal(<?php echo json_encode($data); ?>)' class="text-blue-600 font-bold mr-2">Edit</button>
-                                            <a href="kelola_guru.php?delete_user_id=<?php echo $data['user_id']; ?>" onclick="return confirm('Menghapus guru ini juga akan menghapus akun loginnya! Lanjutkan?')" class="text-red-600 font-bold">Hapus</a>
+                                            <button onclick='openEditModal(<?php echo json_encode($data); ?>)' class="text-blue-600 font-bold mr-2 hover:underline">Edit</button>
+                                            <a href="kelola_guru.php?delete_user_id=<?php echo $data['user_id']; ?>" onclick="return confirm('Menghapus guru ini juga akan menghapus akun loginnya! Lanjutkan?')" class="text-red-600 font-bold hover:underline">Hapus</a>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -173,13 +174,13 @@ $result = mysqli_query($koneksi, $query_data);
                     <input type="email" name="email" id="inputEmail" required class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
                 </div>
                 <div class="flex items-center gap-2 mb-6">
-                    <input type="checkbox" name="status_aktif" id="inputStatus" value="1" checked>
+                    <input type="checkbox" name="status_aktif" id="inputStatus" value="1" checked class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500">
                     <label class="text-sm font-bold text-slate-700">Status Aktif</label>
                 </div>
                 
-                <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeModal()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg text-sm">Batal</button>
-                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm">Simpan</button>
+                <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg text-sm hover:bg-slate-300">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700">Simpan</button>
                 </div>
             </form>
         </div>

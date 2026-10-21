@@ -68,6 +68,7 @@ $role = $_SESSION['role'] ?? '';
         <div class="pt-4 pb-1">
             <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Aktivitas</p>
         </div>
+
         <a href="catatan_pelanggaran.php" class="flex items-center gap-4 px-4 py-3 text-sm font-bold text-slate-700 hover:text-blue-600 transition <?php echo $current_page == 'catatan_pelanggaran.php' ? 'text-blue-600 bg-blue-50 rounded-lg' : ''; ?>">
             <i class="fa-solid fa-clipboard-user text-lg w-5 text-center"></i> Catat Pelanggaran
         </a>

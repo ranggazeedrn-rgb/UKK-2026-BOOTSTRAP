@@ -52,7 +52,7 @@ session_start();
             <!-- Floating Navigation -->
             <div class="flex justify-center mb-10">
                 <nav class="flex items-center gap-2 bg-white/80 backdrop-blur-md border border-slate-200 p-1.5 rounded-full shadow-sm">
-                    <a href="profile.php" class="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-bold shadow-md">Profil</a>
+                    <a href="aboutme.php" class="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-bold shadow-md">Profil</a>
                     <a href="skill.php" class="px-5 py-2 rounded-full text-slate-500 hover:text-blue-600 hover:bg-blue-50 text-sm font-bold transition">Skill</a>
                     <a href="project.php" class="px-5 py-2 rounded-full text-slate-500 hover:text-blue-600 hover:bg-blue-50 text-sm font-bold transition">Proyek</a>
                 </nav>
@@ -75,7 +75,7 @@ session_start();
                             Hi, saya <span class="text-gradient-accent">Rangga</span>.
                         </h1>
                         <p class="text-lg text-slate-500 max-w-xl leading-relaxed mb-8 font-medium">
-                            Pelajar yang sangat antusias dengan dunia teknologi. Saya merancang antarmuka yang bersih dan membangun sistem di baliknya.
+                            Pelajar yang sangat antusias dengan dunia teknologi. Saya merancang UI/UX yang bersih dan membangun sistem di baliknya.
                         </p>
                         
                         <div class="flex flex-wrap gap-4">
@@ -188,7 +188,7 @@ session_start();
                         <a href="https://github.com/ranggazeedrn-rgb" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
                             <i class="fa-brands fa-github text-xl"></i>
                         </a>
-                        <a href="#" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
+                        <a href="https://www.instagram.com/ranggastrnger?psln=MWxsNjJxZzI5aXdycw==" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">
                             <i class="fa-brands fa-instagram text-xl"></i>
                         </a>
                         <a href="gmailto:ranggazeedrn@gmail.com" class="w-12 h-12 rounded-full bg-white/10 bder border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-blue-700 transition-all shadow-sm backdrop-blur-sm">

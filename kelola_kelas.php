@@ -3,41 +3,90 @@ session_start();
 include 'config/koneksi.php';
 include 'cek_akses.php';
 
+// Ambil daftar Tahun Ajaran dengan aman menggunakan SELECT *
+$tahun_ajaran_list = false;
+try {
+    $tahun_ajaran_list = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran ORDER BY id DESC");
+} catch (Exception $e) {
+    // Abaikan jika tabel tidak ditemukan
+}
+
+// Cek apakah tabel t_kelas memiliki kolom tahun_ajaran_id
+$has_tahun_ajaran = false;
+try {
+    $cek_kolom = mysqli_query($koneksi, "SHOW COLUMNS FROM t_kelas LIKE 'tahun_ajaran_id'");
+    if ($cek_kolom && mysqli_num_rows($cek_kolom) > 0) {
+        $has_tahun_ajaran = true;
+    }
+} catch (Exception $e) {}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     $id = $_POST['id'] ?? null;
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $tingkat = mysqli_real_escape_string($koneksi, $_POST['tingkat']);
     $jurusan = mysqli_real_escape_string($koneksi, $_POST['jurusan']);
+    $tahun_ajaran_id = mysqli_real_escape_string($koneksi, $_POST['tahun_ajaran_id'] ?? '');
     $status_aktif = isset($_POST['status_aktif']) ? 1 : 0;
 
-    if ($action === 'create') {
-        $query = "INSERT INTO t_kelas (nama, tingkat, jurusan, status_aktif, created_at, updated_at) 
-                  VALUES ('$nama', '$tingkat', '$jurusan', '$status_aktif', NOW(), NOW())";
-        if (mysqli_query($koneksi, $query)) {
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil ditambahkan!'];
+    try {
+        if ($action === 'create') {
+            if ($has_tahun_ajaran && !empty($tahun_ajaran_id)) {
+                $query = "INSERT INTO t_kelas (nama, tingkat, jurusan, tahun_ajaran_id, status_aktif, created_at, updated_at) 
+                          VALUES ('$nama', '$tingkat', '$jurusan', '$tahun_ajaran_id', '$status_aktif', NOW(), NOW())";
+                mysqli_query($koneksi, $query);
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil ditambahkan!'];
+            } else {
+                $query = "INSERT INTO t_kelas (nama, tingkat, jurusan, status_aktif, created_at, updated_at) 
+                          VALUES ('$nama', '$tingkat', '$jurusan', '$status_aktif', NOW(), NOW())";
+                mysqli_query($koneksi, $query);
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil ditambahkan (Tanpa Kolom Tahun Ajaran)!'];
+            }
+
+        } elseif ($action === 'update' && $id) {
+            if ($has_tahun_ajaran && !empty($tahun_ajaran_id)) {
+                $query = "UPDATE t_kelas SET nama='$nama', tingkat='$tingkat', jurusan='$jurusan', tahun_ajaran_id='$tahun_ajaran_id', status_aktif='$status_aktif', updated_at=NOW() WHERE id='$id'";
+                mysqli_query($koneksi, $query);
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil diperbarui!'];
+            } else {
+                $query = "UPDATE t_kelas SET nama='$nama', tingkat='$tingkat', jurusan='$jurusan', status_aktif='$status_aktif', updated_at=NOW() WHERE id='$id'";
+                mysqli_query($koneksi, $query);
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil diperbarui!'];
+            }
         }
-    } elseif ($action === 'update' && $id) {
-        $query = "UPDATE t_kelas SET nama='$nama', tingkat='$tingkat', jurusan='$jurusan', status_aktif='$status_aktif', updated_at=NOW() WHERE id='$id'";
-        if (mysqli_query($koneksi, $query)) {
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil diperbarui!'];
-        }
+    } catch (Exception $e) {
+        $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()];
     }
+    
     header("Location: kelola_kelas.php");
     exit();
 }
 
 if (isset($_GET['delete_id'])) {
     $id = (int)$_GET['delete_id'];
-    if (mysqli_query($koneksi, "DELETE FROM t_kelas WHERE id = '$id'")) {
+    try {
+        mysqli_query($koneksi, "DELETE FROM t_kelas WHERE id = '$id'");
         $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Kelas berhasil dihapus!'];
+    } catch (Exception $e) {
+        $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal menghapus kelas: ' . $e->getMessage()];
     }
     header("Location: kelola_kelas.php");
     exit();
 }
 
-$query_data = "SELECT * FROM t_kelas ORDER BY tingkat ASC, jurusan ASC, nama ASC";
-$result = mysqli_query($koneksi, $query_data);
+// Fitur Filter/Search
+$search = $_GET['search'] ?? '';
+$where = "";
+if (!empty($search)) {
+    $s = mysqli_real_escape_string($koneksi, $search);
+    $where = "WHERE nama LIKE '%$s%' OR tingkat LIKE '%$s%' OR jurusan LIKE '%$s%'";
+}
+
+$query_data = "SELECT * FROM t_kelas $where ORDER BY tingkat ASC, jurusan ASC, nama ASC";
+$result = false;
+try {
+    $result = mysqli_query($koneksi, $query_data);
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -57,13 +106,10 @@ $result = mysqli_query($koneksi, $query_data);
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex">
     
-    <!-- Sidebar -->
     <?php include 'layouts/sidebar.php'; ?>
 
-    <!-- Main Content -->
     <main class="flex-1 p-8 bg-slate-50 overflow-y-auto">
         
-        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-black">Kelola Data Kelas</h1>
@@ -82,6 +128,11 @@ $result = mysqli_query($koneksi, $query_data);
             </div>
             <?php unset($_SESSION['flash']); ?>
         <?php endif; ?>
+
+        <form method="GET" class="mb-6 flex gap-2">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Cari Nama Kelas, Tingkat, atau Jurusan..." class="px-4 py-2 border border-slate-300 rounded-lg text-sm w-80 focus:outline-none focus:border-blue-600">
+            <button type="submit" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg text-sm font-bold">Cari</button>
+        </form>
 
         <div class="bg-white p-6 rounded-[1.5rem] shadow-sm border border-slate-200">
             <h3 class="text-sm font-bold text-black mb-4">Daftar Kelas</h3>
@@ -104,7 +155,7 @@ $result = mysqli_query($koneksi, $query_data);
                                     <td class="border border-slate-300 px-4 py-3 text-sm text-center font-bold text-slate-600 bg-slate-50"><?php echo htmlspecialchars($data['tingkat']); ?></td>
                                     <td class="border border-slate-300 px-4 py-3 text-sm text-center text-blue-600 font-bold"><?php echo htmlspecialchars($data['jurusan']); ?></td>
                                     <td class="border border-slate-300 px-4 py-3 text-sm text-center">
-                                        <?php echo $data['status_aktif'] == 1 ? '<span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded text-xs">Aktif</span>' : '<span class="text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded text-xs">Non-Aktif</span>'; ?>
+                                        <?php echo (isset($data['status_aktif']) && $data['status_aktif'] == 1) ? '<span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded text-xs">Aktif</span>' : '<span class="text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded text-xs">Non-Aktif</span>'; ?>
                                     </td>
                                     <td class="border border-slate-300 px-4 py-3 text-sm text-center">
                                         <button onclick='openEditModal(<?php echo json_encode($data); ?>)' class="text-blue-600 font-bold mr-2 hover:underline">Edit</button>
@@ -114,7 +165,7 @@ $result = mysqli_query($koneksi, $query_data);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="border border-slate-300 px-4 py-8 text-center text-slate-500 font-bold">Belum ada data.</td>
+                                <td colspan="5" class="border border-slate-300 px-4 py-8 text-center text-slate-500 font-bold">Belum ada data kelas.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -151,6 +202,22 @@ $result = mysqli_query($koneksi, $query_data);
                     </div>
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">TAHUN AJARAN</label>
+                    <select name="tahun_ajaran_id" id="inputTahunAjaran" class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
+                        <option value="">-- Pilih Tahun Ajaran --</option>
+                        <?php 
+                        if ($tahun_ajaran_list && mysqli_num_rows($tahun_ajaran_list) > 0) {
+                            mysqli_data_seek($tahun_ajaran_list, 0);
+                            while ($ta = mysqli_fetch_assoc($tahun_ajaran_list)) {
+                                $t_name = $ta['tahun_ajaran'] ?? $ta['nama'] ?? 'TA ' . $ta['id'];
+                                echo "<option value='{$ta['id']}'>{$t_name}</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+
                 <div class="flex items-center gap-2 mb-6">
                     <input type="checkbox" name="status_aktif" id="inputStatus" value="1" checked class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500">
                     <label class="text-sm font-bold text-slate-700">Set Kelas Aktif</label>
@@ -170,7 +237,7 @@ $result = mysqli_query($koneksi, $query_data);
     <script>
         $(document).ready(function() {
             $('#tabelData').DataTable({
-                "searching": false, // Menyembunyikan form pencarian bawaan DataTables
+                "searching": false, 
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data",
                     "zeroRecords": "Tidak ada data yang ditemukan",
@@ -196,6 +263,7 @@ $result = mysqli_query($koneksi, $query_data);
             document.getElementById('dataId').value = '';
             document.getElementById('inputNama').value = '';
             document.getElementById('inputJurusan').value = '';
+            document.getElementById('inputTahunAjaran').value = '';
             document.getElementById('inputStatus').checked = true;
         }
 
@@ -207,6 +275,11 @@ $result = mysqli_query($koneksi, $query_data);
             document.getElementById('inputNama').value = data.nama;
             document.getElementById('inputTingkat').value = data.tingkat;
             document.getElementById('inputJurusan').value = data.jurusan;
+            if(data.tahun_ajaran_id) {
+                document.getElementById('inputTahunAjaran').value = data.tahun_ajaran_id;
+            } else {
+                document.getElementById('inputTahunAjaran').value = '';
+            }
             document.getElementById('inputStatus').checked = data.status_aktif == 1;
         }
 
