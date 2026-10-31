@@ -4,42 +4,13 @@ session_start();
 include 'config/koneksi.php';
 include 'cek_akses.php';
 
-// Proses Simpan / Edit Data
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
-    $id = $_POST['id'] ?? null;
-    $nis = mysqli_real_escape_string($koneksi, $_POST['nis']);
-    $nisn = mysqli_real_escape_string($koneksi, $_POST['nisn']);
-    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
-    $jenis_kelamin = mysqli_real_escape_string($koneksi, $_POST['jenis_kelamin']);
-    $tanggal_lahir = mysqli_real_escape_string($koneksi, $_POST['tanggal_lahir']);
-    $alamat = mysqli_real_escape_string($koneksi, $_POST['alamat']);
-    $status_aktif = isset($_POST['status_aktif']) ? 1 : 0;
-
-    if ($action === 'create') {
-        $query = "INSERT INTO t_siswa (nis, nisn, nama, jenis_kelamin, tanggal_lahir, alamat, status_aktif, created_at, updated_at) 
-                  VALUES ('$nis', '$nisn', '$nama', '$jenis_kelamin', '$tanggal_lahir', '$alamat', '$status_aktif', NOW(), NOW())";
-        if (mysqli_query($koneksi, $query)) {
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Siswa berhasil ditambahkan!'];
-        } else {
-            $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal simpan data: ' . mysqli_error($koneksi)];
-        }
-    } elseif ($action === 'update' && $id) {
-        $query = "UPDATE t_siswa SET nis='$nis', nisn='$nisn', nama='$nama', jenis_kelamin='$jenis_kelamin', 
-                  tanggal_lahir='$tanggal_lahir', alamat='$alamat', status_aktif='$status_aktif', updated_at=NOW() WHERE id='$id'";
-        if (mysqli_query($koneksi, $query)) {
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Siswa berhasil diperbarui!'];
-        }
-    }
-    header("Location: kelola_siswa.php");
-    exit();
-}
-
 // Proses Hapus
 if (isset($_GET['delete_id'])) {
     $id = (int)$_GET['delete_id'];
     if (mysqli_query($koneksi, "DELETE FROM t_siswa WHERE id = '$id'")) {
         $_SESSION['flash'] = ['type' => 'success', 'message' => 'Data Siswa berhasil dihapus!'];
+    } else {
+        $_SESSION['flash'] = ['type' => 'danger', 'message' => 'Gagal menghapus: ' . mysqli_error($koneksi)];
     }
     header("Location: kelola_siswa.php");
     exit();
@@ -61,16 +32,7 @@ $result = mysqli_query($koneksi, $query_data);
 <head>
     <title>Kelola Data Siswa</title>
     <?php include 'layouts/head.php'; ?>
-    
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <style>
-        .dataTables_wrapper .dataTables_length select {
-            border: 1px solid #cbd5e1;
-            border-radius: 0.5rem;
-            padding: 0.25rem;
-            outline: none;
-        }
-    </style>
 </head>
 <body class="bg-white text-slate-800 font-sans">
     <div class="flex min-h-screen">
@@ -80,7 +42,9 @@ $result = mysqli_query($koneksi, $query_data);
         <main class="flex-1 p-8 bg-white overflow-y-auto">
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-2xl font-bold text-black">Kelola Data Siswa</h1>
-                <button onclick="openModal('create')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm"><i class="fa-solid fa-plus"></i>  Tambah Siswa</button>
+                <a href="tambah_siswa.php" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Tambah Siswa
+                </a>
             </div>
 
             <?php if (isset($_SESSION['flash'])): ?>
@@ -109,7 +73,7 @@ $result = mysqli_query($koneksi, $query_data);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (mysqli_num_rows($result) > 0): ?>
+                            <?php if ($result && mysqli_num_rows($result) > 0): ?>
                                 <?php while ($data = mysqli_fetch_assoc($result)): ?>
                                     <tr class="hover:bg-slate-50">
                                         <td class="border border-slate-300 px-4 py-3 text-sm text-center"><?php echo htmlspecialchars($data['nis']); ?></td>
@@ -119,7 +83,7 @@ $result = mysqli_query($koneksi, $query_data);
                                             <?php echo $data['status_aktif'] == 1 ? '<span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded text-xs">Aktif</span>' : '<span class="text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded text-xs">Non-Aktif</span>'; ?>
                                         </td>
                                         <td class="border border-slate-300 px-4 py-3 text-sm text-center">
-                                            <button onclick='openEditModal(<?php echo json_encode($data); ?>)' class="text-blue-600 font-bold mr-2 hover:underline">Edit</button>
+                                            <a href="edit_siswa.php?id=<?php echo $data['id']; ?>" class="text-blue-600 font-bold mr-2 hover:underline">Edit</a>
                                             <a href="kelola_siswa.php?delete_id=<?php echo $data['id']; ?>" onclick="return confirm('Hapus siswa ini?')" class="text-red-600 font-bold hover:underline">Hapus</a>
                                         </td>
                                     </tr>
@@ -134,104 +98,21 @@ $result = mysqli_query($koneksi, $query_data);
         </main>
     </div>
 
-    <!-- Modal Form -->
-    <div id="modalForm" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white max-w-lg w-full p-8 rounded-2xl shadow-xl">
-            <h3 id="modalTitle" class="text-xl font-bold text-black mb-6">Form Siswa</h3>
-            <form method="POST" action="kelola_siswa.php">
-                <input type="hidden" name="action" id="formAction" value="create">
-                <input type="hidden" name="id" id="dataId">
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">NIS</label>
-                    <input type="text" name="nis" id="inputNis" required class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">NISN</label>
-                    <input type="text" name="nisn" id="inputNisn" class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" name="nama" id="inputNama" required class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Kelamin</label>
-                        <select name="jenis_kelamin" id="inputJk" required class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
-                            <option value="L">Laki-laki</option>
-                            <option value="P">Perempuan</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" id="inputTgl" required class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none">
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Alamat</label>
-                    <textarea name="alamat" id="inputAlamat" rows="2" class="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:border-blue-600 focus:outline-none"></textarea>
-                </div>
-                <div class="flex items-center gap-2 mb-6">
-                    <input type="checkbox" name="status_aktif" id="inputStatus" value="1" checked class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500">
-                    <label class="text-sm font-bold text-slate-700">Status Aktif</label>
-                </div>
-                <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
-                    <button type="button" onclick="closeModal()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg text-sm hover:bg-slate-300">Batal</button>
-                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- JS jQuery dan DataTables -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#tabelData').DataTable({
-                "searching": false, // Menyembunyikan form pencarian bawaan DataTables
+                "searching": false, 
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data",
                     "zeroRecords": "Tidak ada data yang ditemukan",
                     "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
                     "infoEmpty": "Tidak ada data tersedia",
-                    "infoFiltered": "(disaring dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Pertama",
-                        "last": "Terakhir",
-                        "next": "Selanjutnya",
-                        "previous": "Sebelumnya"
-                    }
+                    "paginate": { "first": "Pertama", "last": "Terakhir", "next": "Selanjutnya", "previous": "Sebelumnya" }
                 }
             });
         });
-    </script>
-
-    <script>
-        function openModal(mode) {
-            document.getElementById('modalForm').classList.remove('hidden');
-            if(mode === 'create') {
-                document.getElementById('formAction').value = 'create';
-                document.getElementById('dataId').value = '';
-                document.getElementById('inputNis').value = '';
-                document.getElementById('inputNisn').value = '';
-                document.getElementById('inputNama').value = '';
-                document.getElementById('inputAlamat').value = '';
-                document.getElementById('inputStatus').checked = true;
-            }
-        }
-        function openEditModal(data) {
-            document.getElementById('modalForm').classList.remove('hidden');
-            document.getElementById('formAction').value = 'update';
-            document.getElementById('dataId').value = data.id;
-            document.getElementById('inputNis').value = data.nis;
-            document.getElementById('inputNisn').value = data.nisn;
-            document.getElementById('inputNama').value = data.nama;
-            document.getElementById('inputJk').value = data.jenis_kelamin;
-            document.getElementById('inputTgl').value = data.tanggal_lahir;
-            document.getElementById('inputAlamat').value = data.alamat;
-            document.getElementById('inputStatus').checked = data.status_aktif == 1;
-        }
-        function closeModal() { document.getElementById('modalForm').classList.add('hidden'); }
     </script>
 </body>
 </html>
